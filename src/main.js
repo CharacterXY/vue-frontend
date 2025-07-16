@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 import vuetify from './plugins/vuetify' 
-import { ro } from 'vuetify/locale'
+import router from './router'
 
 createApp(App)
   .use(vuetify)

@@ -1,8 +1,10 @@
+import LoginPage from './components/LoginPage.vue'
 <script setup>
 
 </script>
 
 <template>
+  <router-view />
   <LoginPage />
 </template>
 
