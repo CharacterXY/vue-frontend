@@ -39,8 +39,11 @@ export async function sendRegisterUserToDatabase(formData) {
   }
 
   export async function updateUser(id, userData) {
+
+
+
     try {
-      const response = await fetch(`${API_URL}/user/${id}`, {
+      const response = await fetch(`http://localhost:8000/api/users/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -49,9 +52,9 @@ export async function sendRegisterUserToDatabase(formData) {
         body: JSON.stringify(userData),
       });
   
-      const result = await response.json(); 
-  
-      if (!response.ok) {
+          const result = await response.json(); 
+          console.log("Rezultat ažuriranja korisnika:", result);
+        if (!response.ok) {
         console.error("Greška pri ažuriranju korisnika:", result);
         throw new Error(result.message || "Greška pri ažuriranju korisnika");
       }

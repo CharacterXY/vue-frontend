@@ -2,7 +2,7 @@
 import router from '../router';
 import { watch } from 'vue';
 import EditUserModal from '../components/EditUserModal.vue';
-import { fetchUserData, fetchUsersByNumber, deleteUserById } from '../../api';
+import { fetchUserData, fetchUsersByNumber, deleteUserById, updateUser } from '../../api';
 import { ref, onMounted } from 'vue'
 
 const users = ref([])
@@ -224,7 +224,7 @@ window.addEventListener('resize', checkMobileScreen);
                 text-color="white"
                 size="x-small"
               >
-                {{ user.isActive ? 'Aktivan' : 'Neaktivan' }}
+                {{ user.isActive  ? 'Aktivan' : 'Neaktivan' }}
               </v-chip>
             </div>
           </v-card-text>

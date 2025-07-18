@@ -22,10 +22,11 @@ watch(() => props.user, (newUser) => {
   if (newUser) {
     editedUser.value = {
       ...newUser,
-      is_active: Boolean(newUser.is_active),
-    }
+      is_active: newUser.isActive === 1, // eksplicitno === 1 za true
+    };
   }
-}, { immediate: true })
+}, { immediate: true });
+
 
 
 
@@ -34,24 +35,39 @@ const close = () => {
   emit('update:modelValue', false)
 }
 
+
+
 const saveUser = async () => {
   try {
-    
-    const response = await updateUser(editedUser.value.id, editedUser.value)
+    const userToSave = {
+      id: editedUser.value.id,
+      username: editedUser.value.username,
+      email: editedUser.value.email,
+      name: editedUser.value.name,
+      lastname: editedUser.value.lastname,
+      phone: editedUser.value.phone,
+      address: editedUser.value.address,
+      password: editedUser.value.password,
+      role: editedUser.value.role,
+      isActive: editedUser.value.is_active ? 1 : 0, 
+    };
 
-    console.log('Ažurirani korisnik:', response)
+    console.log("Šaljem backendu:", userToSave);  
+    const response = await updateUser(userToSave.id, userToSave);
+    console.log('Ažurirani korisnik:', response);
 
     if (response.success) {
-      emit('userUpdated')
-      close()
+      emit('userUpdated');
+      close();
     } else {
-      console.error('Greška prilikom ažuriranja:', response.message)
+      console.error('Greška prilikom ažuriranja:', response.message);
     }
   } catch (err) {
-    console.error('Greška:', err)
-    throw new Error('Greška prilikom ažuriranja korisnika')
+    console.error('Greška:', err);
   }
-}
+};
+
+
 
 </script>
 
@@ -62,7 +78,7 @@ const saveUser = async () => {
       <v-card-text>
         <v-text-field class="user-firstname" v-model="editedUser.name" label="Ime" />
         <v-text-field class="user-lastname" v-model="editedUser.lastname" label="Prezime" />
-        <v-text-field  class="user-email" v-model="editedUser.email" type="email" label="Email" />
+        <v-text-field  class="user-email" v-model="editedUser.email"  label="Email" />
         <v-text-field class="user-username" v-model="editedUser.username" label="Korisničko ime" />
         <v-text-field class="user-phone" v-model="editedUser.phone" label="Telefon" />
         <v-text-field class="user-address" v-model="editedUser.address" label="Adresa" />
@@ -74,12 +90,11 @@ const saveUser = async () => {
           class="user-role"
         />
         <v-switch
-            v-model="editedUser.is_active"
-            :label="editedUser.is_active ? 'Aktivan' : 'Neaktivan'"
-            :class="editedUser.is_active ? 'user-active' : 'user-inactive'"
-          
-            color="success"
-        />
+    v-model="editedUser.is_active"
+    :label="editedUser.is_active ? 'Aktivan' : 'Neaktivan'"
+    :class="editedUser.is_active ? 'user-active' : 'user-inactive'"
+    color="success"
+/>
 
       </v-card-text>
       <v-card-actions>
