@@ -1,11 +1,12 @@
+<script setup>
+//const LoggedUser = JSON.parse(localStorage.getItem("user"));
+const name = JSON.parse(localStorage.getItem("user"))
+
+
+</script>
+
 <template>
-    <v-container class="pa-4">
-      <h1>User Dashboard</h1>
-      <p>Dobrodošao/la! Ovo je korisnička kontrolna ploča.</p>
-    </v-container>
-  </template>
-  
-  <script setup>
-  // Ovdje ide JS logika po potrebi
-  </script>
-  
+  <h1>User Dashboard</h1>
+  <p>Dobrodošao/la!  {{ name?.username || 'Korisnice' }}  </p>
+</template>
+
