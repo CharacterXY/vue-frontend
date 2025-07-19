@@ -5,9 +5,10 @@ import LoginPage from './components/LoginPage.vue'
 </script>
 
 <template>
-  <router-view />
+<v-app dense flat>
+    <router-view />
+</v-app>
 </template>
-
 
 
 <style scoped>

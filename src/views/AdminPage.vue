@@ -4,6 +4,7 @@ import { watch } from 'vue';
 import EditUserModal from '../components/EditUserModal.vue';
 import { fetchUserData, fetchUsersByNumber, deleteUserById, updateUser } from '../../api';
 import { ref, onMounted } from 'vue'
+import Navbar from '../components/Navbar.vue';
 
 const users = ref([])
 const mobileForm = ref(false)
@@ -13,11 +14,6 @@ const snackbarText = ref('')
 const snackbarColor = ref('info')
 
 
-const showSnackbar = (text, color = 'info') => {
-  snackbarText.value = text
-  snackbarColor.value = color
-  snackbar.value = true
-}
 
 const loggedUser = JSON.parse(localStorage.getItem("user"));
 
@@ -34,6 +30,7 @@ const headers = [
   { title: 'Kreiran', key: 'created_at' },
   { title: 'Zadnja izmjena', key: 'updated_at' },
   { title: 'Akcije', key: 'actions', sortable: false, }
+
 ]
 
 watch(rowsPerPage, async (rowsPerPage) => {
@@ -80,7 +77,7 @@ const deleteUser = async (id) => {
     const response = await deleteUserById(id);
     if (response.success) {
       users.value = users.value.filter(user => user.id !== id);
-      showSnackbar("Korisnik uspješno obrisan", "success");
+   
       console.log("User deleted successfully");
 
     } else {
@@ -132,7 +129,8 @@ window.addEventListener('resize', checkMobileScreen);
 </script>
 
 <template>
-<v-container fluid class="pa-2" style="overflow-x: auto; max-width: 100%;">
+<v-container fluid class="px-7  mt-10" style="max-width:100%; width:100vw; overflow:hidden;">
+
 
   <!-- EDIT USER MODAL -->
   <EditUserModal
@@ -145,8 +143,10 @@ window.addEventListener('resize', checkMobileScreen);
 
 
   <!-- DESKTOP PRIKAZ -->
-  <template v-if="mobileForm">
-    <v-data-table
+  <template v-if="mobileForm" contains="desktop-view"> >
+    <Navbar class="px-6 mb-4" />
+
+  <v-data-table
   :items="users"
   :headers="headers"
   class="elevation-3"
@@ -179,10 +179,9 @@ window.addEventListener('resize', checkMobileScreen);
         <template v-else>
           
           {{ item[column.key] }}
+          {{  console.log("item[column.key]:", item[column.key]) }}
         </template>
       </td>
-     
-
   </tr>
     
   </template> 
@@ -205,6 +204,7 @@ window.addEventListener('resize', checkMobileScreen);
 
   <!-- MOBILE PRIKAZ -->
   <template v-else>
+    <Navbar p-5 />
     <v-row dense>
       <v-col cols="12" v-for="user in users" :key="user.id">
         <v-card class="pa-3 mb-3" elevation="2">
@@ -238,9 +238,7 @@ window.addEventListener('resize', checkMobileScreen);
 
 <style scoped>
 .v-data-table {
-  overflow-x: auto;
   font-size: .8rem;
- 
   background: linear-gradient(to right, #a9c4b8, #939d97);
   ;
 }
@@ -256,8 +254,12 @@ window.addEventListener('resize', checkMobileScreen);
 }
 
 .v-container {
-  overflow-x: auto;
-  max-width: 100%;
+
+  width: 100vw !important;
+}
+
+.desktop-view {
+  width: 100vw !important;
 }
 
 </style>

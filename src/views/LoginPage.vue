@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { loginUser } from "../../api";
+import { isEmpty } from "vuetify/lib/util/helpers.mjs";
 
 const router = useRouter();
 
@@ -10,47 +11,66 @@ const password = ref("");
 const error = ref("");
 const emailError = ref("");
 const passwordError = ref("");
-
+const snackbar = ref(false);
+const snackbarColor = ref("info");
+const SnackbarText = ref("Login successful! Redirecting...");
 const validEmail = ref(false);
 const validPassword = ref(false);
 
 
 
 const validateEmail = () => {
-  if (!email.value.includes("@")) {
+  if(isEmpty(email.value)) {
+    emailError.value = "Email je obavezan";
+  } else if (!email.value.includes("@")) {
     emailError.value = "Email mora sadrzavati @ znak";
-  } else {
+  } else  {
     emailError.value = "";
   }
-};
+}
+
+const sanitizeEmail = () => {
+  email.value = email.value.replace(/[^a-zA-Z0-9@._-]/g, '')
+  validateEmail();
+}
 
 
 const logMeIn = async () => {
-  console.log("uslo");
-  console.log("Email:", email.value);
-  console.log("Password:", password.value);
+  //console.log("uslo");
+  //console.log("Email:", email.value);
+  //console.log("Password:", password.value);
 
   try {
+    // Ako je prijavljeni user ima rolu admin, preusmjeravamo ga u admin dashboard.
     const response = await loginUser(email.value, password.value);
     console.log("Response:", response);
     if (response.success) {
       localStorage.setItem("username", JSON.stringify(response.data.user.username));
       const isAdmin = response.data.user.role === "admin";
       if(isAdmin) {
-        console.log("User is admin, redirecting to admin dashboard");
+        snackbar.value = true;
+        snackbarColor.value = "success";
+        SnackbarText.value = "Prijava uspješna! Preusmjeravanje u admin dio...";
+        await router.push("/admin");
         await router.push("/admin");
       } else {
-        console.log("User is not admin, redirecting to user dashboard");
+        snackbar.value = true;
+        snackbarColor.value = "success";
+        SnackbarText.value = "Prijava uspjesna! Preusmjeravanje...";
+        console.log("Korisanik nije admin, preusmjeravam na dashboard");
         await router.push("/dashboard");
       }
     } else {
       error.value = response.message;
  
+ 
     }
   } catch (err) {
+    snackbar.value = true;
+    snackbarColor.value = "error";
+    SnackbarText.value = "Prijava nije uspjela. Provjerite email i lozinku.";
     console.error("Login error:", err);     
   }
-  validateEmail() ;
 
 };
 
@@ -58,6 +78,15 @@ const logMeIn = async () => {
 
 <template>
   <v-app>
+    <v-snackbar
+        v-model="snackbar"
+        :color="snackbarColor"
+        timeout="3000"
+        location="top center"
+        elevation="4"
+      >
+        {{ SnackbarText }}
+      </v-snackbar>
     <v-main>
       <v-container
         class="main-container fill-height d-flex justify-center align-center"
@@ -69,6 +98,7 @@ const logMeIn = async () => {
               class="user-email"
               label="Email"
               v-model="email"
+              @input="sanitizeEmail"
               :error="!!emailError"
               :error-messages="emailError"
               @blur="validateEmail"
@@ -85,7 +115,7 @@ const logMeIn = async () => {
             />
           </v-card-text>
           <v-card-actions>
-            <v-btn color="info" @click="logMeIn">Login</v-btn>
+            <v-btn color="success" @click="logMeIn">Login</v-btn>
           </v-card-actions>
           <v-card-text>
             <div class="not-member">

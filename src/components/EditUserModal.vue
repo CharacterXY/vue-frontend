@@ -9,6 +9,14 @@ const props = defineProps({
 
 const editedUser = ref({})
 
+const snackbarText = ref('')
+const snackbarColor = ref('success')
+const snackbar = ref({
+  show:false,
+  message: '',
+  color: 'success',
+})
+
 const emit = defineEmits(['update:modelValue', 'userUpdated'])
 
 const isDialogOpen = computed({
@@ -16,25 +24,30 @@ const isDialogOpen = computed({
   set: (val) => emit('update:modelValue', val),
 })
 
+const handleUserUpdate = () => {
+snackbar.value = {
+  show: true,
+  message: 'Korisnik uspješno ažuriran',
+  color: 'success',
+}
+
+}
+
 
 
 watch(() => props.user, (newUser) => {
   if (newUser) {
     editedUser.value = {
       ...newUser,
-      is_active: newUser.isActive === 1, // eksplicitno === 1 za true
+      is_active: newUser.isActive === 1, 
     };
   }
 }, { immediate: true });
 
 
-
-
-
 const close = () => {
   emit('update:modelValue', false)
 }
-
 
 
 const saveUser = async () => {
@@ -56,6 +69,7 @@ const saveUser = async () => {
     const response = await updateUser(userToSave.id, userToSave);
     console.log('Ažurirani korisnik:', response);
 
+ 
     if (response.success) {
       emit('userUpdated');
       close();
@@ -66,12 +80,19 @@ const saveUser = async () => {
     console.error('Greška:', err);
   }
 };
-
-
-
 </script>
 
 <template>
+    <v-snackbar
+      v-model="snackbar"
+      :color="snackbarColor"
+      timeout="3000"
+      location="top center"
+      elevation="4"
+      >
+      {{ snackbarText }}
+    </v-snackbar>
+
   <v-dialog v-model="isDialogOpen" max-width="600px">
     <v-card class="edit-form">
       <v-card-title>Uredi korisnika</v-card-title>
@@ -105,6 +126,9 @@ const saveUser = async () => {
     </v-card>
   </v-dialog>
 </template>
+
+
+
 
 <style scoped>
 .v-card-text > * {
